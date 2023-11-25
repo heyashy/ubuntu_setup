@@ -1,0 +1,65 @@
+---
+- name: Install Zsh
+  become: true
+  apt:
+    name: zsh
+    state: present
+
+- name: Install Utilites
+  become: true
+  apt:
+    name: 
+      - apt-transport-https
+      - gnupg
+      - ca-certificates
+      - curl
+      - wget
+      - figlet
+      - lolcat
+      - software-properties-common
+    state: latest
+  
+
+- name: Install fzf
+  become: true
+  apt:
+    name: fzf
+    state: present
+
+- name: Check if fzf is already initialized in .zshrc
+  shell: grep -Fxq "[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh" ~/.zshrc
+  register: fzf_initialized
+  failed_when: false
+  changed_when: false
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Initialize fzf
+  shell: 'echo "[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh" >> ~/.zshrc'
+  args:
+    executable: /bin/bash
+  when: ansible_distribution == 'Ubuntu' and not fzf_initialized.rc == 0
+
+- name: Install bat
+  become: true
+  apt:
+    name: bat
+    state: present
+
+- name: Check if bat alias is already in .zshrc
+  shell: grep -Fxq 'alias bat="batcat"' ~/.zshrc
+  register: bat_alias_exists
+  failed_when: false
+  changed_when: false
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Add bat alias for batcat
+  shell: 'echo "alias bat=\"batcat\"" >> ~/.zshrc'
+  args:
+    executable: /bin/bash
+  when: ansible_distribution == 'Ubuntu' and not bat_alias_exists.rc == 0
+
+- name: Install Nvim
+  become: true
+  command:
+    cmd: snap install nvim --classic --edge
+    creates: /snap/bin/nvim

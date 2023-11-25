@@ -1,0 +1,43 @@
+- name: Configure Ubuntu
+  hosts: all
+  
+  pre_tasks:
+    - name: System details
+      debug: msg="{{ item }}"
+      with_items: 
+      - "Release: {{ ansible_distribution }} {{ ansible_distribution_release }} {{ ansible_distribution_version }}"
+    - name: update repositories
+      become: true
+      apt: update_cache=yes
+      changed_when: False
+
+  tasks:
+    - include_tasks: tasks/main-packages.yml
+    - include_tasks: tasks/starship.yml
+    - include_tasks: tasks/aws.yml
+    - include_tasks: tasks/terraform.yml
+    - include_tasks: tasks/gcloud.yml
+    - include_tasks: tasks/miniconda.yml
+    
+
+
+  post_tasks:
+      - name: Dist-upgrade
+        become: true
+        apt:
+          upgrade: dist
+
+      - name: Remove useless packages from the cache
+        become: true
+        apt:
+          autoclean: yes
+
+      - name: Remove dependencies that are no longer required
+        become: true
+        apt:
+          autoremove: yes
+
+      - name: Update source
+        shell: "source {{ ansible_env.HOME }}/.zshrc"
+        args:
+          executable: /bin/bash         

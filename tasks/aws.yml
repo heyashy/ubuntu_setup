@@ -1,0 +1,10 @@
+---
+- name: Install AWS CLI
+  pip:
+    name: awscli
+    state: latest
+
+- name: Install AWS SAM CLI
+  pip:
+    name: aws-sam-cli
+    state: latest

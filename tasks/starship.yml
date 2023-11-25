@@ -1,0 +1,23 @@
+---
+- name: Check if Starship is installed
+  become: false
+  stat:
+    path: "/usr/local/bin/starship"
+  register: starship_installed
+
+- name: Install Starship
+  become: true
+  shell: "curl -sS https://starship.rs/install.sh | sh -s -- -f"
+  args:
+    executable: /bin/zsh
+  when: not starship_installed.stat.exists
+
+- name: Add Starship init to .zshrc
+  become: false
+  lineinfile:
+    path: "{{ ansible_env.HOME }}/.zshrc"
+    line: 'eval "$(starship init zsh)"'
+    create: yes
+    state: present
+    insertafter: EOF
+    regexp: '^eval "\$\(starship init zsh\)"$'

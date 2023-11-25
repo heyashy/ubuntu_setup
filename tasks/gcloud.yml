@@ -1,0 +1,38 @@
+---
+- name: Check if Google Cloud SDK GPG key is added
+  become: true
+  stat:
+    path: /usr/share/keyrings/cloud.google.gpg
+  register: gcloud_gpg_key
+
+- name: Check if Google Cloud SDK repo is added
+  become: false
+  stat:
+    path: /etc/apt/sources.list.d/google-cloud-sdk.list
+  register: gcloud_repo
+
+- name: Import Google Cloud public key and setup repository
+  become: true
+  when: not gcloud_gpg_key.stat.exists or not gcloud_repo.stat.exists
+  block:
+    - name: Add Google Cloud SDK GPG key
+      ansible.builtin.shell: |
+        curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg
+
+    - name: Add Google Cloud SDK repository
+      ansible.builtin.lineinfile:
+        path: /etc/apt/sources.list.d/google-cloud-sdk.list
+        line: 'deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main'
+        create: yes
+
+- name: Install Google Cloud CLI
+  become: true
+  block:
+    - name: Update apt cache
+      ansible.builtin.apt:
+        update_cache: yes
+
+    - name: Install google-cloud-cli
+      ansible.builtin.apt:
+        name: google-cloud-cli
+        state: present
