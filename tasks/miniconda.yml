@@ -11,7 +11,7 @@
   block:
     - name: Download Miniconda installer
       get_url:
-        url: https://repo.anaconda.com/miniconda/Miniconda3-py39_23.10.0-1-Linux-x86_64.sh
+        url: https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
         dest: /tmp/miniconda-installer.sh
         mode: '0755'
 
@@ -26,6 +26,9 @@
       shell: "{{ ansible_env.HOME }}/miniconda/bin/conda init zsh"
       args:
         executable: /bin/zsh
+
+    - name: Conda autoactivate base
+      shell: "source conda {{ ansible_env.HOME }}/.zshrc && config --set auto_activate_base true"
 
     - name: Remove Miniconda installer script
       file:

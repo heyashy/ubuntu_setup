@@ -18,6 +18,7 @@
     - include_tasks: tasks/terraform.yml
     - include_tasks: tasks/gcloud.yml
     - include_tasks: tasks/miniconda.yml
+    - include_tasks: tasks/rust.yml
     
 
 
