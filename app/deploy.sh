@@ -12,5 +12,7 @@ else
   zsh
 fi
 
-figlet -f slant "COMPLETED!" | lolcat
-echo "Remember to initialize aws and gcloud cli tools"
+figlet -f slant "SUCCESS" | lolcat
+echo "The system has been initialized successfully" | lolcat
+echo "------------------------------------------------" | lolcat
+echo -e "\e[33mRemember to initialize aws and gcloud cli tools\e[0m"

@@ -13,23 +13,22 @@
 
   tasks:
     # Base system
-    - include_tasks: tasks/zsh.yml
-    - include_tasks: tasks/main-packages.yml
-    - include_tasks: tasks/neovim.yml
-    - include_tasks: tasks/starship.yml
+    - include_tasks: tasks/base_system/zsh.yml
+    - include_tasks: tasks/base_system/main-packages.yml
+    - include_tasks: tasks/base_system/neovim.yml
+    - include_tasks: tasks/base_system/starship.yml
 
     # Software
-    - include_tasks: tasks/miniconda.yml
-    - include_tasks: tasks/golang.yml
+    - include_tasks: tasks/software/miniconda.yml
+    - include_tasks: tasks/software/golang.yml
 
     # providers
-    - include_tasks: tasks/terraform.yml
-    - include_tasks: tasks/aws.yml
-    - include_tasks: tasks/gcloud.yml
+    - include_tasks: tasks/providers/terraform.yml
+    - include_tasks: tasks/providers/aws.yml
+    - include_tasks: tasks/providers/gcloud.yml
+    # - include_tasks: tasks/providers/rust.yml
 
-    # - include_tasks: tasks/rust.yml
-
-    - include_tasks: tasks/update_visuals.yml
+    - include_tasks: tasks/customizations/update_visuals.yml
 
   post_tasks:
     - name: Dist-upgrade

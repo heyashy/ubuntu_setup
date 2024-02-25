@@ -1,0 +1,6 @@
+---
+- name: Install AWS CLI and SAM CLI
+  shell: "{{ ansible_env.HOME }}/miniconda/bin/pip install awscli aws-sam-cli"
+  args:
+    executable: /bin/zsh
+  become: false # Ensure this runs as the user

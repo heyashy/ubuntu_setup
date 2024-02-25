@@ -12,6 +12,24 @@
       - software-properties-common
     state: latest
 
+- name: Check path
+  shell: grep -Fxq "/usr/games" ~/.zshrc
+  register: path_initialized
+  failed_when: false
+  changed_when: false
+  when: ansible_distribution == 'Ubuntu'
+
+- name: Update path
+  become: false
+  when: not path_initialized.rc == 0
+  lineinfile:
+    path: "{{ ansible_env.HOME }}/.zshrc"
+    line: 'export PATH="$PATH:/usr/games"'
+    create: yes
+    state: present
+    insertafter: EOF
+    regexp: '^eval "\$\(starship init zsh\)"$'
+
 - name: Install fzf
   become: true
   apt:
