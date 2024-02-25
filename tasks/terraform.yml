@@ -1,6 +1,0 @@
----
-- name: Install Terraform via Snap
-  become: true
-  command:
-    cmd: snap install terraform --classic
-    creates: /snap/bin/terraform

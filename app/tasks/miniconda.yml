@@ -1,0 +1,51 @@
+---
+- name: Check if Conda is installed
+  become: false
+  stat:
+    path: "{{ ansible_env.HOME }}/miniconda/bin/conda"
+  register: conda_installed
+
+- name: Install Miniconda
+  become: false # Ensure this runs as the user to avoid permission issues with the installed files
+  when: not conda_installed.stat.exists
+  block:
+    - name: Download Miniconda installer
+      get_url:
+        url: https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+        dest: /tmp/miniconda-installer.sh
+        mode: "0755"
+
+    - name: Install Miniconda
+      shell: bash /tmp/miniconda-installer.sh -b -p "{{ ansible_env.HOME }}/miniconda"
+      args:
+        executable: /bin/zsh
+
+    - name: Initialize Miniconda for Zsh
+      shell: "{{ ansible_env.HOME }}/miniconda/bin/conda init zsh"
+      args:
+        executable: /bin/zsh
+      become: false # Ensure this runs as the user
+
+    - name: Conda autoactivate base
+      shell: "{{ ansible_env.HOME }}/miniconda/bin/conda config --set auto_activate_base true"
+      args:
+        executable: /bin/zsh
+      become: false # Ensure this runs as the user
+
+    - name: Remove Miniconda installer script
+      file:
+        path: /tmp/miniconda-installer.sh
+        state: absent
+      become: false # Ensure this runs as the user
+
+    - name: Update base environment to Python 3.10
+      shell: "{{ ansible_env.HOME }}/miniconda/bin/conda install python=3.10 --yes"
+      args:
+        executable: /bin/bash
+      become: false # This should also run as the user to ensure environment consistency
+
+    - name: Install Python packages with pip
+      shell: "{{ ansible_env.HOME }}/miniconda/bin/pip install pandas numpy pymssql plotly matplotlib seaborn"
+      args:
+        executable: /bin/bash
+      become: false # Ensure this runs as the user

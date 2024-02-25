@@ -1,0 +1,14 @@
+---
+- name: Install Zsh
+  become: true
+  apt:
+    name:
+      - zsh
+      - wget
+      - git
+    state: present
+
+- name: Install oh-my-zsh
+  shell:
+    cmd: wget https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh -O - | sh -s -- --unattended
+    creates: ~/.oh-my-zsh

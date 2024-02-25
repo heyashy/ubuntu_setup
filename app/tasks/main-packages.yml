@@ -1,24 +1,16 @@
 ---
-- name: Install Zsh
-  become: true
-  apt:
-    name: zsh
-    state: present
-
 - name: Install Utilites
   become: true
   apt:
-    name: 
+    name:
       - apt-transport-https
       - gnupg
       - ca-certificates
       - curl
-      - wget
       - figlet
       - lolcat
       - software-properties-common
     state: latest
-  
 
 - name: Install fzf
   become: true
@@ -57,9 +49,3 @@
   args:
     executable: /bin/bash
   when: ansible_distribution == 'Ubuntu' and not bat_alias_exists.rc == 0
-
-- name: Install Nvim
-  become: true
-  command:
-    cmd: snap install nvim --classic --edge
-    creates: /snap/bin/nvim

@@ -1,0 +1,42 @@
+---
+- name: Check if Go is installed
+  command: go version
+  register: go_installed
+  ignore_errors: true
+  changed_when: false
+
+- name: Install GoLang
+  become: true # Use 'yes' for system-wide installation, 'no' for a current user installation
+  vars:
+    go_version: "1.22"
+    go_install_dir: "/usr/local"
+  when: go_installed is failed
+  block:
+    - name: Download Go binary
+      get_url:
+        url: "https://go.dev/dl/go{{ go_version }}.0.linux-amd64.tar.gz"
+        dest: "/tmp/go{{ go_version }}.linux-amd64.tar.gz"
+        mode: "0755"
+
+    - name: Extract Go binary
+      unarchive:
+        src: "/tmp/go{{ go_version }}.linux-amd64.tar.gz"
+        dest: "{{ go_install_dir }}"
+        remote_src: yes
+        extra_opts: [--strip-components=1]
+      become: true # Required for writing to /usr/local
+
+    - name: Add Go environment variables to .zshrc
+      lineinfile:
+        path: "c/.zshrc"
+        line: "{{ item }}"
+        create: true
+      loop:
+        - 'export GOROOT="{{ go_install_dir }}"'
+        - 'export PATH="$PATH:{{ go_install_dir }}/bin:$GOPATH/bin"'
+
+    - name: Remove Go binary tarball
+      file:
+        path: "/tmp/go{{ go_version }}.linux-amd64.tar.gz"
+        state: absent
+      become: true # Ensure cleanup is done with elevated privileges

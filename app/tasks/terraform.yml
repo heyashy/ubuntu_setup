@@ -1,0 +1,9 @@
+---
+- name: Conditional Terraform installation
+  become: true
+  when: ansible_env.RUNTIME != "docker"
+  block:
+    - name: Install Terraform via Snap if not running in Docker
+      command:
+        cmd: snap install terraform --classic
+        creates: /snap/bin/terraform
